@@ -1,115 +1,213 @@
-import Image from "next/image";
-import localFont from "next/font/local";
+import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const MAX_HEALTH = 100;
 
-export default function Home() {
+const ChatBubble = ({ agent, message, avatar }) => {
+  const imageUrlRegex = /\[Image: (https?:\/\/[^\s\]]+)\]/;
+  const match = message.match(imageUrlRegex);
+  const imageUrl = match ? match[1] : null;
+  const messageWithoutImage = message.replace(imageUrlRegex, '').trim();
+
   return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/pages/index.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className={`flex mb-2 ${agent.includes('1') ? 'justify-end' : 'justify-start'}`}>
+      {!agent.includes('1') && (
+        <div className="w-8 h-8 rounded-full bg-battle-gray mr-2 flex-shrink-0 overflow-hidden">
+          <Image src={avatar} alt={agent} width={32} height={32} />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
+      <div className={`chat-bubble ${agent.includes('1') ? 'agent1' : 'agent2'}`}>
+        <div className="font-bold text-battle-yellow text-xs">{agent}</div>
+        <div className="typing-animation text-sm">
+          {messageWithoutImage}
+          {imageUrl && (
+            <div className="mt-2">
+              <Image
+                src={imageUrl}
+                alt="Debate image"
+                width={200}
+                height={200}
+                className="rounded-lg"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+      {agent.includes('1') && (
+        <div className="w-8 h-8 rounded-full bg-battle-gray ml-2 flex-shrink-0 overflow-hidden">
+          <Image src={avatar} alt={agent} width={32} height={32} />
+        </div>
+      )}
     </div>
   );
-}
+};
+
+const HomePage = () => {
+  const [character1, setCharacter1] = useState('');
+  const [character2, setCharacter2] = useState('');
+  const [chatLog, setChatLog] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [winner, setWinner] = useState(null);
+  const [matchId, setMatchId] = useState(null);
+  const [agents, setAgents] = useState([]);
+  const [health, setHealth] = useState({ character1: MAX_HEALTH, character2: MAX_HEALTH });
+  const [currentTurn, setCurrentTurn] = useState(0);
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatLog]);
+
+  useEffect(() => {
+    if (matchId && !winner) {
+      const timer = setTimeout(continueBattle, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [matchId, winner, chatLog]);
+
+  const startDebate = async () => {
+    setIsLoading(true);
+    setChatLog([]);
+    setWinner(null);
+    setHealth({ character1: MAX_HEALTH, character2: MAX_HEALTH });
+    setCurrentTurn(0);
+
+    try {
+      const response = await fetch('/api/start-game', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ characters: [character1, character2] }),
+      });
+
+      if (!response.ok) throw new Error('Failed to start the debate');
+
+      const data = await response.json();
+      setMatchId(data.matchId);
+      setChatLog(data.chatLog.filter(entry => entry.agent !== 'System'));
+      setAgents(data.agents);
+      setCurrentTurn(1);
+    } catch (error) {
+      console.error('Error starting the debate:', error);
+      setChatLog(['An error occurred while starting the debate.']);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const continueBattle = async () => {
+    try {
+      const response = await fetch('/api/game-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId, health }),
+      });
+
+      if (!response.ok) throw new Error('Failed to process debate event');
+
+      const data = await response.json();
+      setChatLog(prevChatLog => [...prevChatLog, data.newMessage]);
+      setHealth(data.health);
+      setCurrentTurn(prevTurn => prevTurn + 1);
+      
+      // Display damage dealt
+      const damageMessage = { agent: 'System', message: `${data.newMessage.agent} dealt ${data.damage} damage!` };
+      setChatLog(prevChatLog => [...prevChatLog, damageMessage]);
+      
+      if (data.winner) setWinner(data.winner);
+    } catch (error) {
+      console.error('Error processing debate event:', error);
+      setMatchId(null);
+    }
+  };
+
+  const getCurrentAgent = () => agents[currentTurn % agents.length] || '';
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-battle-blue to-battle-purple flex flex-col items-center justify-center p-4 text-white">
+      <div className="w-full max-w-4xl p-4 rounded-lg shadow-2xl">
+        <h1 className="text-5xl font-battle text-battle-yellow mb-4 text-center animate-glow">Character Debate Arena</h1>
+        
+        <div className="mb-6 flex space-x-4">
+          <input
+            type="text"
+            value={character1}
+            onChange={(e) => setCharacter1(e.target.value)}
+            placeholder="Enter Character 1"
+            className="w-full px-4 py-3 rounded-lg bg-battle-gray text-black font-pixel focus:outline-none focus:ring-2 focus:ring-battle-yellow"
+          />
+          <span className="text-4xl font-battle text-battle-red self-center">VS</span>
+          <input
+            type="text"
+            value={character2}
+            onChange={(e) => setCharacter2(e.target.value)}
+            placeholder="Enter Character 2"
+            className="w-full px-4 py-3 rounded-lg bg-battle-gray text-black font-pixel focus:outline-none focus:ring-2 focus:ring-battle-yellow"
+          />
+        </div>
+
+        <div className="flex justify-center mb-6">
+          <button
+            onClick={startDebate}
+            disabled={isLoading || !character1 || !character2 || matchId}
+            className="px-10 py-4 bg-battle-red text-white font-battle text-3xl rounded-full hover:bg-battle-orange transition-colors disabled:opacity-50 animate-bounce shadow-neon"
+          >
+            {isLoading ? 'Debate in Progress...' : 'START DEBATE'}
+          </button>
+        </div>
+
+        {agents.length > 0 && (
+          <div className="mb-6 text-center">
+            <h2 className="text-2xl font-battle text-battle-yellow mb-2">Debaters:</h2>
+            <p className="text-xl font-pixel">{agents[0]} vs {agents[1]}</p>
+          </div>
+        )}
+
+        {matchId && (
+          <div className="mb-2 flex justify-between items-center text-sm">
+            <div className="w-1/3 pr-2">
+              <div className="bg-battle-gray rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-battle-red h-full"
+                  style={{ width: `${(health.character1 / MAX_HEALTH) * 100}%` }}
+                ></div>
+              </div>
+              <p className="text-center mt-1 font-pixel text-xs">{character1}: {health.character1}</p>
+            </div>
+            <div className="w-1/3 text-center">
+              <p className="font-battle text-lg text-battle-yellow">Turn {currentTurn}: {getCurrentAgent()}</p>
+            </div>
+            <div className="w-1/3 pl-2">
+              <div className="bg-battle-gray rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-battle-blue h-full"
+                  style={{ width: `${(health.character2 / MAX_HEALTH) * 100}%` }}
+                ></div>
+              </div>
+              <p className="text-center mt-1 font-pixel text-xs">{character2}: {health.character2}</p>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-4 h-80 overflow-y-auto scrollbar-custom w-full">
+          {chatLog.filter(entry => entry.agent !== 'System').map((entry, index) => (
+            <ChatBubble
+              key={index}
+              agent={entry.agent}
+              message={entry.message}
+              avatar={`/images/${entry.agent.includes('1') ? 'character1' : 'character2'}.png`}
+            />
+          ))}
+          <div ref={chatEndRef} />
+        </div>
+
+        {winner && (
+          <div className="mt-4 text-3xl font-battle text-battle-yellow text-center animate-winner">
+            Winner: {winner}!
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default HomePage;

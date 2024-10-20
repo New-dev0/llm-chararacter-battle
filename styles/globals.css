@@ -1,0 +1,292 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+:root {
+  --battle-red: #FF4136;
+  --battle-blue: #0074D9;
+  --battle-yellow: #FFDC00;
+  --battle-green: #2ECC40;
+  --battle-purple: #B10DC9;
+  --battle-orange: #FF851B;
+  --battle-gray: #AAAAAA;
+}
+
+body {
+  margin: 0;
+  font-family: 'Press Start 2P', cursive;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #000;
+  color: #fff;
+}
+
+.font-battle {
+  font-family: 'Bangers', cursive;
+}
+
+.font-pixel {
+  font-family: 'Press Start 2P', cursive;
+}
+
+.bg-battle-bg {
+  background-image: url('/images/battle-background.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.character-sprite {
+  width: 200px;
+  height: 200px;
+  background-size: cover;
+  transition: transform 0.3s ease;
+}
+
+.character-sprite:hover {
+  transform: scale(1.1);
+}
+
+.character-left {
+  background-image: url('/images/character-left.png');
+}
+
+.character-right {
+  background-image: url('/images/character-right.png');
+  transform: scaleX(-1);
+}
+
+.animate-idle {
+  animation: idle 0.5s steps(4) infinite;
+}
+
+@keyframes idle {
+  from { background-position: 0px; }
+  to { background-position: -800px; }
+}
+
+.typing-animation {
+  overflow: hidden;
+  border-right: 0.15em solid var(--battle-green);
+  white-space: nowrap;
+  margin: 0 auto;
+  letter-spacing: 0.15em;
+  animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: var(--battle-green) }
+}
+
+.animate-pulse-fast {
+  animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.shadow-neon {
+  box-shadow: 0 0 5px var(--battle-yellow),
+              0 0 10px var(--battle-yellow),
+              0 0 15px var(--battle-yellow),
+              0 0 20px var(--battle-yellow);
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px var(--battle-yellow), 0 0 20px var(--battle-yellow), 0 0 35px var(--battle-yellow), 0 0 40px var(--battle-yellow), 0 0 50px var(--battle-yellow);
+  }
+  to {
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--battle-yellow), 0 0 40px var(--battle-yellow), 0 0 70px var(--battle-yellow), 0 0 80px var(--battle-yellow), 0 0 100px var(--battle-yellow);
+  }
+}
+
+.animate-winner {
+  animation: winner 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes winner {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 12px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: var(--battle-gray);
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: var(--battle-yellow);
+  border-radius: 10px;
+  border: 3px solid var(--battle-gray);
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: var(--battle-orange);
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-bubble {
+  position: relative;
+  padding: 10px 15px;
+  border-radius: 18px;
+  max-width: 70%;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+}
+
+.chat-bubble.system {
+  background-color: var(--battle-yellow);
+  color: black;
+  text-align: center;
+  max-width: 90%;
+  margin: 0 auto 10px;
+}
+
+.chat-bubble.agent1 {
+  background-color: var(--battle-blue);
+  color: white;
+  border-bottom-right-radius: 0;
+  align-self: flex-end;
+}
+
+.chat-bubble.agent2 {
+  background-color: var(--battle-green);
+  color: white;
+  border-bottom-left-radius: 0;
+  align-self: flex-start;
+}
+
+/* Add these new styles for the chat message text */
+.chat-bubble .typing-animation {
+  padding: 5px 10px;
+  border-radius: 10px;
+  display: inline-block;
+  margin-top: 5px;
+}
+
+.chat-bubble.agent1 .typing-animation {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.chat-bubble.agent2 .typing-animation {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.health-bar {
+  height: 20px;
+  background-color: var(--battle-gray);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.health-bar-fill {
+  height: 100%;
+  transition: width 0.5s ease-in-out;
+}
+
+.character1-health {
+  background-color: var(--battle-red);
+}
+
+.character2-health {
+  background-color: var(--battle-blue);
+}
+
+/* Add these styles at the end of the file */
+
+.chat-bubble {
+  position: relative;
+  padding: 10px 15px;
+  border-radius: 18px;
+  max-width: 70%;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+}
+
+.chat-bubble.system {
+  background-color: var(--battle-yellow);
+  color: black;
+  text-align: center;
+  max-width: 90%;
+  margin: 0 auto 10px;
+}
+
+.chat-bubble.agent1 {
+  background-color: var(--battle-blue);
+  color: white;
+  border-bottom-right-radius: 0;
+  align-self: flex-end;
+}
+
+.chat-bubble.agent2 {
+  background-color: var(--battle-green);
+  color: white;
+  border-bottom-left-radius: 0;
+  align-self: flex-start;
+}
+
+.typing-animation {
+  overflow: hidden;
+  border-right: .15em solid var(--battle-yellow);
+  white-space: nowrap;
+  margin: 0 auto;
+  letter-spacing: .15em;
+  animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: var(--battle-yellow) }
+}
